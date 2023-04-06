@@ -1,5 +1,6 @@
 const fs = require('fs/promises');
 const path = require("path");
+const {nanoid} = require('nanoid');
 
 
 
@@ -33,16 +34,52 @@ async function listContacts() {
         console.log(error.message);
     }
   }
-  
-  function removeContact(contactId) {
-    // ...твій код
+
+   async function addContact(name, email, phone) {
+    try {
+      const readData = await getPath(contactsPath);
+const newContact = {
+  id: nanoid(),
+  name,
+  email,
+  phone,
+}
+const newData = [...readData, newContact];
+
+const addContacts = await fs.writeFile(
+  contactsPath,
+  JSON.stringify(newData, null, 2)
+);
+
+console.table(newData);
+
+return addContacts;
+  }catch (error){
+      console.log(error.message);
   }
+  }
+
+    
+  async function removeContact(contactId) {
+    try {
+      const readData = await getPath(contactsPath);
+      const deleteById = readData.filter(item => item.id !== contactId);
+      const resultRemove = await fs.writeFile(
+        contactsPath,
+        JSON.stringify(deleteById, null, 2)
+      );
   
-  function addContact(name, email, phone) {
-    // ...твій код
+      console.table(deleteById);
+  
+      return resultRemove;
+  }catch (error){
+      console.log(error.message);
+  }
   }
 
   module.exports ={
     listContacts,
     getContactById,
+    addContact,
+    removeContact,
   }
